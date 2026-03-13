@@ -1,7 +1,7 @@
 bl_info = {
     "name": "uBrick Generator",
     "author": "maox (ufolab.it)",
-    "version": (0, 9),
+    "version": (0, 9, 2),
     "blender": (3, 0, 0),
     "location": "View3D > Add > Mesh > uBrick",
     "description": "Genera mattoncini procedurali compatibili LEGO con stud, fondo cavo e nervature interne",
@@ -57,37 +57,37 @@ def crea_mattone(stud_x, stud_y, altezza_mattoni, context,
     it0=v(t,      t,      H); it1=v(ox+W-t, t,      H)
     it2=v(ox+W-t, oy+L-t, H); it3=v(t,      oy+L-t, H)
 
-    # ── Pareti esterne — normale outward ─────────────────────────
-    bm.faces.new([e0,e1,e5,e4])  # front -Y
-    bm.faces.new([e1,e2,e6,e5])  # right +X
-    bm.faces.new([e2,e3,e7,e6])  # back  +Y
-    bm.faces.new([e3,e0,e4,e7])  # left  -X
+    # ── Pareti esterne ───────────────────────────────────────────
+    bm.faces.new([e0,e1,e5,e4])  # front
+    bm.faces.new([e1,e2,e6,e5])  # right
+    bm.faces.new([e2,e3,e7,e6])  # back
+    bm.faces.new([e3,e0,e4,e7])  # left
 
-    # ── Pareti interne — normale verso la cavità ──────────────────
-    bm.faces.new([ib0,ib1,im1,im0])  # front inner +Y
-    bm.faces.new([ib1,ib2,im2,im1])  # right inner -X
-    bm.faces.new([ib2,ib3,im3,im2])  # back  inner -Y
-    bm.faces.new([ib3,ib0,im0,im3])  # left  inner +X
+    # ── Pareti interne — [im,ib] per edge consistenti con bottom ring e soffitto
+    bm.faces.new([im0,im1,ib1,ib0])  # front +Y
+    bm.faces.new([im1,im2,ib2,ib1])  # right -X
+    bm.faces.new([im2,im3,ib3,ib2])  # back  -Y
+    bm.faces.new([im3,im0,ib0,ib3])  # left  +X
 
-    # ── Anello fondo — normale DOWN ───────────────────────────────
+    # ── Anello fondo ─────────────────────────────────────────────
     bm.faces.new([e1,e0,ib0,ib1])
     bm.faces.new([e2,e1,ib1,ib2])
     bm.faces.new([e3,e2,ib2,ib3])
     bm.faces.new([e0,e3,ib3,ib0])
 
-    # ── Soffitto cavità z=zp — normale DOWN ──────────────────────
+    # ── Soffitto cavità z=zp ─────────────────────────────────────
     bm.faces.new([im1,im0,im3,im2])
 
-    # ── Ring top z=H — normale UP (+Z) ───────────────────────────
-    bm.faces.new([e4,e5,it1,it0])  # front ring
-    bm.faces.new([e5,e6,it2,it1])  # right ring
-    bm.faces.new([e6,e7,it3,it2])  # back  ring
-    bm.faces.new([e7,e4,it0,it3])  # left  ring
+    # ── Ring top z=H ─────────────────────────────────────────────
+    bm.faces.new([e4,e5,it1,it0])
+    bm.faces.new([e5,e6,it2,it1])
+    bm.faces.new([e6,e7,it3,it2])
+    bm.faces.new([e7,e4,it0,it3])
 
-    # ── Piano top centrale z=H — normale UP (+Z) ─────────────────
+    # ── Piano top centrale z=H ───────────────────────────────────
     bm.faces.new([it0,it1,it2,it3])
 
-    # ── Stud: cilindri chiusi, base a H+0.01 ─────────────────────
+    # ── Stud: cilindri chiusi con fan triangulation ───────────────
     zb = H + 0.01;  zt = zb + STUD_H
     for xi in range(stud_x):
         for yi in range(stud_y):
@@ -98,10 +98,13 @@ def crea_mattone(stud_x, stud_y, altezza_mattoni, context,
                 a = 2*math.pi*i/SEG
                 rb.append(v(cx+sr*math.cos(a), cy+sr*math.sin(a), zb))
                 rt.append(v(cx+sr*math.cos(a), cy+sr*math.sin(a), zt))
-            bm.faces.new(list(reversed(rb)))  # base DOWN
-            bm.faces.new(rt)                  # top  UP
+            cb = v(cx, cy, zb)
+            ct = v(cx, cy, zt)
             for i in range(SEG):
-                n=(i+1)%SEG; bm.faces.new([rb[i],rb[n],rt[n],rt[i]])
+                n=(i+1)%SEG
+                bm.faces.new([rb[n], rb[i], cb])   # base DOWN
+                bm.faces.new([rt[i], rt[n], ct])   # top  UP
+                bm.faces.new([rb[i], rb[n], rt[n], rt[i]])  # mantello
 
     # ── Tubi anti-stud ───────────────────────────────────────────
     for xi in range(1, stud_x):
