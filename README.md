@@ -9,7 +9,7 @@
 
 > A Blender add-on to generate procedural LEGO®-compatible bricks — manifold, print-ready, no Boolean ops needed.
 
-**Current version: 0.9** — All normals correct, slicer-ready, zero open edges.
+**Current version: 0.9.2** — All normals correct, slicer-ready, zero open edges.
 
 ---
 
