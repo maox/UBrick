@@ -1,5 +1,10 @@
 # uBrick Generator
 
+![Blender](https://img.shields.io/badge/Blender-3.0+-orange)
+![License](https://img.shields.io/badge/License-GPL%20v3-blue)
+![Version](https://img.shields.io/badge/version-0.9.2-green)
+![Slicer](https://img.shields.io/badge/PrusaSlicer-zero%20errors-brightgreen)
+
 ![uBrick Generator](ubrick-github-cover.png)
 
 > A Blender add-on to generate procedural LEGO®-compatible bricks — manifold, print-ready, no Boolean ops needed.
